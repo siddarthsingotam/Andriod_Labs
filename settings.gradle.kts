@@ -23,3 +23,4 @@ rootProject.name = "Andriod_Labs"
 include(":app")
 include(":app:lab07")
 include(":app:lab08")
+include(":app:lab06")
