@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,10 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -34,20 +40,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             Andriod_LabsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ParliamentMembersList(members = ParliamentMembersData.members, modifier = Modifier.padding(innerPadding))
+                    ParliamentMemberScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
 @Composable
 fun ParliamentMembersList(members: List<ParliamentMember>, modifier: Modifier = Modifier) {
@@ -55,6 +54,26 @@ fun ParliamentMembersList(members: List<ParliamentMember>, modifier: Modifier = 
         items(members.size) { index ->
             ParliamentMemberItem(member = members[index])
         }
+    }
+}
+
+@Composable
+fun ParliamentMemberScreen(modifier: Modifier = Modifier) {
+    // State to hold the current selected member
+    var currentMember by remember { mutableStateOf(ParliamentMembersData.members.random()) }
+
+    // Filter only the ministers from the list
+    val ministers = ParliamentMembersData.members.filter { it.minister }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize() // Fill the available space
+            .padding(16.dp), // Add space around the content
+        verticalArrangement = Arrangement.Center
+    ) {
+        ParliamentMemberItem(member = currentMember)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { currentMember = ministers.random() }) { Text(text = "Next") }
     }
 }
 
