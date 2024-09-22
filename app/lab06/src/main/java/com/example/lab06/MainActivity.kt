@@ -69,7 +69,8 @@ fun ParliamentMemberScreen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize() // Fill the available space
             .padding(16.dp), // Add space around the content
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
         ParliamentMemberItem(member = currentMember)
         Spacer(modifier = Modifier.height(16.dp))
@@ -82,7 +83,9 @@ fun ParliamentMemberItem(member: ParliamentMember) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
         Image(
             painter = // Placeholder while loading
@@ -115,6 +118,6 @@ fun ParliamentMemberItem(member: ParliamentMember) {
 @Composable
 fun DefaultPreview() {
     Andriod_LabsTheme {
-        ParliamentMembersList(members = ParliamentMembersData.members)
+        ParliamentMemberScreen()
     }
 }
