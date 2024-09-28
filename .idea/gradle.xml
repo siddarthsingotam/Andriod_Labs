@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/app/lab06" />
             <option value="$PROJECT_DIR$/app/lab07" />
             <option value="$PROJECT_DIR$/app/lab08" />
+            <option value="$PROJECT_DIR$/app/myfirstcoroutine" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
