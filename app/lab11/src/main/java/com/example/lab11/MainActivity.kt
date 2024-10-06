@@ -3,6 +3,7 @@ package com.example.lab11
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
@@ -48,23 +49,11 @@ import com.example.lab11.ui.theme.Andriod_LabsTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.UUID
-
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import android.bluetooth.BluetoothDevice
 
 
 class MyViewModel : ViewModel() {
     companion object GattAttributes {
         const val SCAN_PERIOD: Long = 3000
-        const val STATE_DISCONNECTED = 0
-        const val STATE_CONNECTING = 1
-        const val STATE_CONNECTED = 2
-        val UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb")
-        val UUID_HEART_RATE_SERVICE = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb")
-        val UUID_CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     }
 
     val scanResults = MutableLiveData<List<ScanResult>>(null)
@@ -80,9 +69,9 @@ class MyViewModel : ViewModel() {
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                         .setReportDelay(0)
                         .build()
-                    scanner.startScan(null, settings, leScanCallback)
+                    scanner.startScan(null, settings, listScanCallback)
                     delay(SCAN_PERIOD)
-                    scanner.stopScan(leScanCallback)
+                    scanner.stopScan(listScanCallback)
                     scanResults.postValue(mResults.values.toList())
                     fScanning.postValue(false)
                 } catch (e: SecurityException) {
@@ -94,7 +83,7 @@ class MyViewModel : ViewModel() {
         }
     }
 
-    val leScanCallback: ScanCallback = object : ScanCallback() {
+    val listScanCallback: ScanCallback = object : ScanCallback() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
@@ -133,15 +122,18 @@ fun ShowDevices(mBluetoothAdapter: BluetoothAdapter, model: MyViewModel = viewMo
 
         if (value.isNullOrEmpty()) {
             Text(text = "No devices found", modifier = Modifier.padding(8.dp))
-        }
-        else {
+        } else {
             Column(
                 modifier = Modifier.fillMaxSize().padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(2.dp)) {
                     items(value ?: emptyList()) { result ->
-                        val deviceName = result.device.name ?: "UNKNOWN"
+                        val deviceName = if (context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                            result.device.name ?: "UNKNOWN"
+                        } else {
+                            "UNKNOWN"
+                        }
                         val deviceAddress = result.device.address
                         val deviceStrength = result.rssi
 
@@ -169,8 +161,8 @@ fun ShowDevices(mBluetoothAdapter: BluetoothAdapter, model: MyViewModel = viewMo
                             }
 
                             Button(
-                                enabled = result.isConnectable(),
-                                onClick = { Log.d("DBG", "Clicked ${result.device.address} ${result.device.name}") },
+                                enabled = result.isConnectable,
+                                onClick = { Log.d("DBG", "Clicked ${result.device.address} ${deviceName}") },
                                 modifier = Modifier.padding(8.dp).align(Alignment.CenterVertically)
                             ) {
                                 Text("Connect")
@@ -200,7 +192,7 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_ADMIN), 1);
+                Manifest.permission.BLUETOOTH_ADMIN), 1)
         }
         return true
     }
@@ -220,7 +212,7 @@ class MainActivity : ComponentActivity() {
                         Log.i("DBG", "Device has Bluetooth support: ${hasPermissions()}")
                         when {
                             mBluetoothAdapter == null       -> Text("Bluetooth is not supported on this device")
-                            !mBluetoothAdapter!!.isEnabled  -> Text("Bluetooth is turned off")
+                            !mBluetoothAdapter!!.isEnabled  -> Text("Bluetooth is turned OFF")
                             else                            -> ShowDevices(mBluetoothAdapter!!, viewModel())
                         }
                     }
