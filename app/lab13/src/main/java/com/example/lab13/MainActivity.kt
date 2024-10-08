@@ -276,10 +276,8 @@ fun ShowDevices(mBluetoothAdapter: BluetoothAdapter, model: MyViewModel = viewMo
 @Composable
 fun ShowDevicesPreview() {
     Andriod_LabsTheme {
-        // You can customize this preview to show a specific UI state
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Text("Preview of Bluetooth Devices")
-            // Add more UI elements here if needed for the preview
         }
     }
 }
