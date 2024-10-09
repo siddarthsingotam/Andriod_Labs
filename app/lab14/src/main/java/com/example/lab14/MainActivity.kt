@@ -23,16 +23,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.livedata.observeAsState
 import com.example.lab13.ShowDevices
 
 class MyViewModel : ViewModel() {
@@ -205,6 +199,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Andriod_LabsTheme {
+                var showGraph by remember { mutableStateOf(false) }
+                val viewModel: MyViewModel = viewModel()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
                         if (hasPermissions()) {
@@ -213,7 +210,17 @@ class MainActivity : ComponentActivity() {
                             } else if (!mBluetoothAdapter!!.isEnabled) {
                                 Text("Bluetooth is turned OFF")
                             } else {
-                                ShowDevices(mBluetoothAdapter!!)
+                                if (showGraph) {
+                                    HeartRateGraphScreen(
+                                        heartRateData = viewModel.heartRateMeasurements,
+                                        onBack = { showGraph = false }
+                                    )
+                                } else {
+                                    ShowDevices(mBluetoothAdapter!!, viewModel)
+                                    Button(onClick = { showGraph = true }) {
+                                        Text("Show Heart Rate Graph")
+                                    }
+                                }
                             }
                         } else {
                             Text("Please grant Bluetooth permissions.")
