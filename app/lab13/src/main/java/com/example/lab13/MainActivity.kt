@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ShowDevices(mBluetoothAdapter: BluetoothAdapter, model: MyViewModel = viewModel()) {
+fun ShowDevices(mBluetoothAdapter: BluetoothAdapter, model: com.example.lab14.MyViewModel = viewModel()) {
     val context = LocalContext.current
     val value: List<ScanResult>? by model.scanResults.observeAsState(null)
     val fScanning: Boolean by model.fScanning.observeAsState(false)
